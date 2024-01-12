@@ -18,6 +18,7 @@ function App() {
   const [cls, setCls] = useState();
   const [clsName, setClsName] = useState('');
   const [clsTeacher, setClsTeacher] = useState();
+  const [clsStudentURLs, setClsStudentURLs] = useState([]);
 
   const [teachers, setTeachers] = useState([]);
   const [teacher, setTeacher] = useState();
@@ -97,6 +98,11 @@ function App() {
   const handleCreateClass = (event) => {
     event.preventDefault();
 
+    if (clsStudentURLs.length === 0) {
+      setErrorMessage('Please select at least one student.');
+      return;
+    }
+
     fetch(`${BASE_API}/classes/`, {
       method: 'POST', 
       headers: {
@@ -105,7 +111,8 @@ function App() {
       },
       body: JSON.stringify({
         name: clsName,
-        teacher: clsTeacher
+        teacher: clsTeacher,
+        students: clsStudentURLs
       }), 
     })
     .then(response => {
@@ -149,6 +156,11 @@ function App() {
   const handleUpdateClass = (event) => {
     event.preventDefault();
 
+    if (clsStudentURLs.length === 0) {
+      setErrorMessage('Please select at least one student.');
+      return;
+    }
+
     fetch(cls.url, {
       method: 'PATCH', 
       headers: {
@@ -157,7 +169,8 @@ function App() {
       },
       body: JSON.stringify({
         name: clsName,
-        teacher: clsTeacher
+        teacher: clsTeacher,
+        students: clsStudentURLs
       }), 
     })
     .then(response => {
@@ -452,10 +465,12 @@ function App() {
         break;
       case '/class-create':
         fetchTeachers();
+        fetchStudents();
         break;
       case '/class-detail':
         fetchClass(searchParams.get('url'));
         fetchTeachers();
+        fetchStudents();
         break;
       case '/teachers':
         fetchTeachers();
@@ -477,7 +492,25 @@ function App() {
         break;
     }
     // eslint-disable-next-line
-  }, []);
+  }, [path]);
+
+  useEffect(() => {
+    if (cls && students) {
+      setClsStudentURLs(students.filter(stu => stu.cclass === cls.url).map(stu => stu.url));
+    }
+  }, [cls, students]);
+
+  const handleSelectClsStudents = (event) => {
+    const studentUrl = event.target.value;
+    if (event.target.checked) {
+      setClsStudentURLs(prev => [
+        ...prev,
+        studentUrl
+      ]);
+    } else {
+      setClsStudentURLs(clsStudentURLs.filter(stu => stu !== studentUrl));
+    }
+  }
   
   const renderLoginPage = (
     <Container>
@@ -571,6 +604,16 @@ function App() {
           </Form.Select>
         </Form.Group>
 
+        <Form.Group className="mb-3">
+          <Form.Label>Students ({clsStudentURLs.length})</Form.Label>
+          {students.filter(stu => !stu.cclass).map(stu => (
+            <Form.Check key={stu.id} value={stu.url} label={stu.name} onChange={handleSelectClsStudents} />
+          ))}
+          {students.filter(stu => !stu.cclass).length === 0 && (
+            <p style={{color: 'orange'}}>No students to asign, please add students first.</p>
+          )}
+        </Form.Group>
+
         {errorMessage && <p style={{color: 'red'}}>{errorMessage}</p>}
 
         <Button variant="primary" type="submit">
@@ -596,6 +639,20 @@ function App() {
               <option key={t.id} value={t.url}>{t.name}</option>
             ))}
           </Form.Select>
+        </Form.Group>
+
+        <Form.Group className="mb-3">
+          <Form.Label>Students ({clsStudentURLs.length})</Form.Label>
+          {students.filter(stu => !stu.cclass || stu.cclass === cls?.url).map(stu => (
+            <Form.Check
+              key={stu.id}
+              id={`check-cls-stu-${stu.id}`}
+              name="check-cls-stu"
+              value={stu.url}
+              label={stu.name}
+              onChange={handleSelectClsStudents}
+              checked={!!clsStudentURLs.includes(stu.url)} />
+          ))}
         </Form.Group>
 
         {errorMessage && <p style={{color: 'red'}}>{errorMessage}</p>}
