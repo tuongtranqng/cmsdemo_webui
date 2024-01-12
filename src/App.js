@@ -611,7 +611,7 @@ function App() {
             <Form.Check key={stu.id} value={stu.url} label={stu.name} onChange={handleSelectClsStudents} />
           ))}
           {students.filter(stu => !stu.cclass).length === 0 && (
-            <p style={{color: 'orange'}}>No students to asign, please add students first.</p>
+            <p style={{color: 'orange'}}>No free students to asign, please add students first.</p>
           )}
         </Form.Group>
 
@@ -674,7 +674,7 @@ function App() {
       <div style={{textAlign: 'right', marginBottom: '10px'}}>
         <Button href="/teacher-create">Add</Button>
       </div>
-      <Table responsive>
+      <Table responsive bordered>
         <thead>
           <tr>
             <th>Name</th>
@@ -738,7 +738,7 @@ function App() {
       <div style={{textAlign: 'right', marginBottom: '10px'}}>
         <Button href="/student-create">Add</Button>
       </div>
-      <Table responsive>
+      <Table responsive bordered>
         <thead>
           <tr>
             <th>Name</th>
