@@ -1,0 +1,16 @@
+version: "1.0"
+services:
+  csmdemoweb:
+    build: .
+    container_name: cmsdemoweb
+    restart: on-failure
+    ports:
+      - "3000:3000"
+    command: npm start
+    networks:
+      - default
+    volumes:
+      - ./src:/app/src
+
+networks:
+  default:
