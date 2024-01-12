@@ -563,7 +563,8 @@ function App() {
     <>
       <h1>Classes</h1>
       <div style={{textAlign: 'right', marginBottom: '10px'}}>
-        <Button href="/class-create">Add</Button>
+        <Button href={`${BASE_API}/export-to-pdf/`}>Export to PDF</Button>
+        <Button href="/class-create" style={{ marginLeft: '10px' }}>Add</Button>
       </div>
       <Table responsive bordered>
         <thead>
