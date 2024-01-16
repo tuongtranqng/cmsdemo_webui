@@ -511,6 +511,32 @@ function App() {
       setClsStudentURLs(clsStudentURLs.filter(stu => stu !== studentUrl));
     }
   }
+
+  const handleExport = () => {
+    fetch(`${BASE_API}/export-to-pdf/`, {
+      headers: {
+        Authorization: 'Token ' + localStorage.getItem('token')
+      }
+    })
+    .then(response => {
+      if (response.ok) {
+        response.blob().then(blob => {
+          var fileURL = window.URL.createObjectURL(blob);
+          var a = document.createElement("a");
+          a.href = fileURL;
+          a.download = 'classes.pdf';
+          a.click();
+          window.URL.revokeObjectURL(fileURL);
+        });
+      } else {
+        setErrorMessage('Could not export classes');
+      }
+    })
+    .catch(error => {
+      console.error('Error: ' + error);
+      alert(error);
+    });
+  }
   
   const renderLoginPage = (
     <Container>
@@ -563,7 +589,7 @@ function App() {
     <>
       <h1>Classes</h1>
       <div style={{textAlign: 'right', marginBottom: '10px'}}>
-        <Button href={`${BASE_API}/export-to-pdf/`}>Export to PDF</Button>
+        <Button onClick={handleExport}>Export to PDF</Button>
         <Button href="/class-create" style={{ marginLeft: '10px' }}>Add</Button>
       </div>
       <Table responsive bordered>
